@@ -91,7 +91,7 @@
             </td>
             <td><%= p.getPublishTime() != null ? p.getPublishTime().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) : "N/A" %></td>
             <td>
-                <a href="#" class="action-link">编辑</a>
+                <a href="edit_product?id=<%= p.getProductId() %>" class="action-link">编辑</a>
 
                 <%-- 标记已售/重新上架 --%>
                 <% if (p.getStatus() == 0) { %>

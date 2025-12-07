@@ -20,4 +20,11 @@ public class ProductService {
         // 直接调用 DAO 层获取在售商品数据
         return productDao.getAllProducts();
     }
+
+    /**
+     * 根据关键词搜索商品
+     */
+    public List<Product> searchProducts(String keyword) {
+        return productDao.searchProducts(keyword);
+    }
 }

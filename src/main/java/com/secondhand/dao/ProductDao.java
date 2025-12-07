@@ -250,4 +250,84 @@ public class ProductDao {
         }
         return success;
     }
+
+    public boolean updateProduct(Product product) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        boolean success = false;
+        // 动态更新：如果图片路径不为空则更新图片，否则保留原图（SQL逻辑在Servlet处理更简单，这里假设传入的product已经包含了最终图片路径）
+        String sql = "UPDATE t_product SET product_name=?, description=?, price=?, image_url=?, category_id=? WHERE product_id=? AND user_id=?";
+
+        try {
+            conn = DBUtil.getConnection();
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, product.getProductName());
+            pstmt.setString(2, product.getDescription());
+            pstmt.setBigDecimal(3, product.getPrice());
+            pstmt.setString(4, product.getImageUrl()); // 这里的URL必须是最终确定的路径
+            pstmt.setInt(5, product.getCategoryId());
+            pstmt.setInt(6, product.getProductId());
+            pstmt.setInt(7, product.getUserId()); // 安全校验：确保只能改自己的
+
+            success = pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DBUtil.close(conn, pstmt, null);
+        }
+        return success;
+    }
+
+    /**
+     * 根据关键词搜索在售商品 (模糊查询)
+     * @param keyword 搜索关键词
+     * @return 匹配的商品列表
+     */
+    public List<Product> searchProducts(String keyword) {
+        List<Product> productList = new ArrayList<>();
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        // SQL: 在名称或描述中查找包含关键词的记录，且状态必须为 0 (在售)
+        String sql = "SELECT * FROM t_product WHERE status = 0 AND (product_name LIKE ? OR description LIKE ?) ORDER BY publish_time DESC";
+
+        try {
+            conn = DBUtil.getConnection();
+            if (conn == null) return productList;
+
+            pstmt = conn.prepareStatement(sql);
+            // 拼接通配符 %
+            String param = "%" + keyword + "%";
+            pstmt.setString(1, param);
+            pstmt.setString(2, param);
+
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                Product product = new Product();
+                product.setProductId(rs.getInt("product_id"));
+                product.setProductName(rs.getString("product_name"));
+                product.setDescription(rs.getString("description"));
+                product.setPrice(rs.getBigDecimal("price"));
+                product.setImageUrl(rs.getString("image_url"));
+                product.setStatus(rs.getInt("status"));
+                product.setCategoryId(rs.getInt("category_id"));
+                product.setUserId(rs.getInt("user_id"));
+
+                Timestamp ts = rs.getTimestamp("publish_time");
+                if (ts != null) {
+                    product.setPublishTime(ts.toLocalDateTime());
+                }
+                productList.add(product);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Search products failed: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            DBUtil.close(conn, pstmt, rs);
+        }
+        return productList;
+    }
 }
