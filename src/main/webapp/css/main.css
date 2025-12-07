@@ -1,0 +1,315 @@
+/* ================================================================
+ * 合并样式表
+ * - 登录/注册页面: 使用第一份CSS样式
+ * - 其他页面: 使用第二份CSS样式(包含商品网格)
+ * ================================================================ */
+
+/* ----------------------------------------------------------------
+ * 1. 全局基础样式
+ * ---------------------------------------------------------------- */
+body {
+    font-family: 'Microsoft YaHei', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f2f5;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    /* 登录/注册页面需要min-height来实现垂直居中 */
+}
+
+/* 仅为登录/注册/发布页面启用垂直居中和全屏高度 */
+body:has(.login-box),
+body:has(.register-box),
+body:has(.publish-container) {
+    min-height: 100vh;
+    align-items: center;
+}
+
+h1, h2, h3 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 20px; /* 减少标题底部间距 */
+    text-align: center;
+}
+
+a {
+    color: #1890ff;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* ----------------------------------------------------------------
+ * 2. 登录/注册页面样式 (使用第一份CSS)
+ * ---------------------------------------------------------------- */
+.login-box,
+.register-box {
+    background: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+/* 登录页宽度稍窄，注册页稍宽 */
+.login-box {
+    width: 360px;
+}
+
+.register-box {
+    width: 400px;
+}
+
+/* 标题与输入区域间距 */
+.login-box h2,
+.register-box h2 {
+    margin-bottom: 25px;
+}
+
+/* 登录/注册页面的输入框样式 */
+.login-box input,
+.register-box input,
+.register-box select,
+.register-box textarea {
+    width: 100%;
+    padding: 12px 14px;
+    margin: 10px 0 15px 0;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 15px;
+    box-sizing: border-box;
+}
+
+.login-box input:focus,
+.register-box input:focus,
+.register-box select:focus,
+.register-box textarea:focus {
+    border-color: #40a9ff;
+    box-shadow: 0 0 4px rgba(24, 144, 255, 0.4);
+    outline: none;
+}
+
+/* ----------------------------------------------------------------
+ * 3. 其他页面样式 (使用第二份CSS)
+ * ---------------------------------------------------------------- */
+
+/* 内容页容器 - 从顶部开始，不垂直居中 */
+.content-container {
+    background: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    max-width: 1000px;
+    width: 90%;
+    min-height: 500px;
+    text-align: center;
+    margin: 80px auto 20px auto; /* 顶部留白80px */
+    align-self: flex-start;
+}
+
+/* 发布页面容器 - 垂直居中版本 */
+.publish-container {
+    background: white;
+    padding: 30px 35px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    width: 600px;
+    max-width: 95%;
+    margin: 20px auto;     /* 上下留小间距即可，垂直居中由body的align-items控制 */
+    text-align: left;
+    display: block;
+    height: auto;
+}
+
+/* 发布页面表单宽度修为居中效果更明显 */
+.publish-container .form-group {
+    width: 90%;
+    margin: 0 auto 18px auto;
+}
+
+.publish-container .form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #555;
+    font-size: 14px;
+}
+
+/* 通用表单控件 (用于其他页面) */
+.form-control {
+    width: 100%;
+    padding: 12px 14px;
+    margin: 5px 0 10px 0; /* 减少上下间距 */
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 15px;
+    box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-control:focus {
+    border-color: #40a9ff;
+    box-shadow: 0 0 4px rgba(24, 144, 255, 0.4);
+    outline: none;
+}
+
+/* 文本域特殊处理 */
+textarea.form-control {
+    resize: vertical;
+    min-height: 120px;
+}
+
+/* 文件上传框美化 */
+.file-input-wrapper {
+    width: 100%;
+    padding: 10px;
+    border: 1px dashed #ccc;
+    border-radius: 6px;
+    background: #fafafa;
+    text-align: center;
+    box-sizing: border-box;
+    margin-top: 5px;
+}
+
+/* ----------------------------------------------------------------
+ * 4. 商品网格 (Product Grid)
+ * ---------------------------------------------------------------- */
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+    margin-top: 30px;
+    text-align: left;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.product-card {
+    border: 1px solid #eee;
+    border-radius: 8px;
+    overflow: hidden;
+    background: white;
+    transition: transform 0.2s;
+    display: block;
+    color: inherit;
+    text-decoration: none;
+    max-width: 100%;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* 商品图片 - 关键修正：固定高度+裁剪 */
+.product-img {
+    width: 100%; /* 占满父容器宽度 */
+    height: 180px; /* 固定高度 */
+    object-fit: cover; /* 裁剪图片以适应容器，防止变形 */
+    display: block;
+    background-color: #f9f9f9;
+}
+
+.product-info {
+    padding: 12px;
+}
+
+.product-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.product-price {
+    color: #e74c3c;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: #999;
+    padding: 40px;
+}
+
+/* ----------------------------------------------------------------
+ * 5. 按钮样式 (通用)
+ * ---------------------------------------------------------------- */
+.btn {
+    display: inline-block;
+    padding: 12px 0;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    text-decoration: none !important;
+    width: 100%; /* 默认100%宽 */
+    box-sizing: border-box;
+}
+
+.btn-primary {
+    background-color: #1890ff;
+    color: white;
+    margin-top: 10px;
+    transition: background-color 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #40a9ff;
+}
+
+/* 发布页面按钮 80% 宽度 */
+.publish-container .btn-primary {
+    width: 80%;
+}
+
+/* 退出按钮 - 自适应宽度 */
+.btn-logout {
+    background-color: #e74c3c;
+    color: white !important;
+    padding: 10px 40px; /* 左右内边距 */
+    border-radius: 6px;
+    margin-top: 20px;
+    width: auto; /* 自适应宽度 */
+    min-width: 120px;
+    display: inline-block;
+}
+
+.btn-logout:hover {
+    background-color: #c0392b;
+}
+
+/* ----------------------------------------------------------------
+ * 6. 消息提示
+ * ---------------------------------------------------------------- */
+.error {
+    color: #e74c3c;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.success {
+    color: #27ae60;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.footer-link {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #888;
+}
+
+.footer-link a {
+    color: #1890ff;
+    text-decoration: none;
+}
