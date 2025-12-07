@@ -146,4 +146,83 @@ public class UserDao {
         }
         return success;
     }
+
+    /**
+     * 根据用户ID查询用户 (用于获取卖家信息)
+     * @param userId 用户的唯一ID
+     * @return 匹配的用户对象或 null
+     */
+    public User getUserById(int userId) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        User user = null;
+
+        // 注意：不查询 password
+        String sql = "SELECT user_id, username, nickname, phone, address, role, create_time " +
+                "FROM t_user WHERE user_id = ?";
+
+        try {
+            conn = DBUtil.getConnection();
+            if (conn == null) return null;
+
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, userId);
+            rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                user = new User();
+                user.setUserId(rs.getInt("user_id"));
+                user.setUsername(rs.getString("username"));
+                user.setNickname(rs.getString("nickname"));
+                user.setPhone(rs.getString("phone"));
+                user.setAddress(rs.getString("address"));
+                user.setRole(rs.getInt("role"));
+                // 注册时间等字段的封装可根据需要进行补充
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Query user by ID failed: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            DBUtil.close(conn, pstmt, rs);
+        }
+        return user;
+    }
+
+    /**
+     * 更新用户的个人信息（昵称、电话、地址）
+     * @param user 包含 user_id 和要更新字段的 User 实体
+     * @return 更新成功返回 true，否则返回 false
+     */
+    public boolean updateUserInfo(User user) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        boolean success = false;
+
+        // SQL 语句：根据 user_id 更新昵称、电话和地址
+        String sql = "UPDATE t_user SET nickname = ?, phone = ?, address = ? WHERE user_id = ?";
+
+        try {
+            conn = DBUtil.getConnection();
+            if (conn == null) return false;
+
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, user.getNickname());
+            pstmt.setString(2, user.getPhone());
+            pstmt.setString(3, user.getAddress());
+            pstmt.setInt(4, user.getUserId());
+
+            int rowsAffected = pstmt.executeUpdate();
+
+            success = rowsAffected > 0;
+
+        } catch (SQLException e) {
+            System.err.println("User information update failed with SQL error: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            DBUtil.close(conn, pstmt, null);
+        }
+        return success;
+    }
 }

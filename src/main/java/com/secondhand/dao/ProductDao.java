@@ -101,4 +101,153 @@ public class ProductDao {
         }
         return productList;
     }
+
+    /**
+     * 根据商品ID查询商品详情
+     * @param productId 商品的唯一ID
+     * @return 匹配的商品对象或 null
+     */
+    public Product getProductById(int productId) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        Product product = null;
+
+        // 查询指定 ID 的商品（不限制 status, 即使已售也应能查看详情）
+        String sql = "SELECT * FROM t_product WHERE product_id = ?";
+
+        try {
+            conn = DBUtil.getConnection();
+            if (conn == null) return null;
+
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, productId);
+            rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                product = new Product();
+                product.setProductId(rs.getInt("product_id"));
+                product.setProductName(rs.getString("product_name"));
+                product.setDescription(rs.getString("description"));
+                product.setPrice(rs.getBigDecimal("price"));
+                product.setImageUrl(rs.getString("image_url"));
+                product.setStatus(rs.getInt("status"));
+                product.setCategoryId(rs.getInt("category_id"));
+                product.setUserId(rs.getInt("user_id"));
+                // (此处省略 publishTime 的封装，与 getAllProducts 类似)
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Failed to fetch product by ID: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            DBUtil.close(conn, pstmt, rs);
+        }
+        return product;
+    }
+
+    /**
+     * 根据用户ID查询其发布的所有商品
+     * @param userId 发布者ID
+     * @return 商品列表
+     */
+    public List<Product> getProductsByUserId(int userId) {
+        List<Product> productList = new ArrayList<>();
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        // 查询指定 user_id 的所有商品，按发布时间倒序排列
+        String sql = "SELECT * FROM t_product WHERE user_id = ? ORDER BY publish_time DESC";
+
+        try {
+            conn = DBUtil.getConnection();
+            if (conn == null) return productList;
+
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, userId);
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                // ... (封装 Product 实体对象的逻辑，与 getAllProducts 类似，此处省略) ...
+                Product product = new Product();
+                product.setProductId(rs.getInt("product_id"));
+                product.setProductName(rs.getString("product_name"));
+                product.setDescription(rs.getString("description"));
+                product.setPrice(rs.getBigDecimal("price"));
+                product.setImageUrl(rs.getString("image_url"));
+                product.setStatus(rs.getInt("status"));
+                product.setCategoryId(rs.getInt("category_id"));
+                product.setUserId(rs.getInt("user_id"));
+
+                Timestamp ts = rs.getTimestamp("publish_time");
+                if (ts != null) {
+                    product.setPublishTime(ts.toLocalDateTime());
+                }
+
+                productList.add(product);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Failed to fetch products by user ID: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            DBUtil.close(conn, pstmt, rs);
+        }
+        return productList;
+    }
+
+    /**
+     * 更新商品状态 (标记已售/重新上架)
+     * @param productId 商品ID
+     * @param status 新状态 (0:在售, 1:已售)
+     * @return 更新成功返回 true，否则返回 false
+     */
+    public boolean updateProductStatus(int productId, int status) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        boolean success = false;
+        String sql = "UPDATE t_product SET status = ? WHERE product_id = ?";
+        // ... (数据库更新逻辑) ...
+        try {
+            conn = DBUtil.getConnection();
+            if (conn == null) return false;
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, status);
+            pstmt.setInt(2, productId);
+            success = pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Failed to update product status: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            DBUtil.close(conn, pstmt, null);
+        }
+        return success;
+    }
+
+    /**
+     * 根据商品ID删除商品记录
+     * @param productId 商品ID
+     * @return 删除成功返回 true，否则返回 false
+     */
+    public boolean deleteProduct(int productId) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        boolean success = false;
+        String sql = "DELETE FROM t_product WHERE product_id = ?";
+        // ... (数据库删除逻辑) ...
+        try {
+            conn = DBUtil.getConnection();
+            if (conn == null) return false;
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, productId);
+            success = pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Failed to delete product: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            DBUtil.close(conn, pstmt, null);
+        }
+        return success;
+    }
 }

@@ -35,7 +35,10 @@
     <p>你的身份：普通用户 | 学号：<%= user.getUsername() %></p>
     <!-- 导航按钮组 -->
     <div style="margin-top: 15px;">
-      <!-- 移除 style 属性，让它继承 main.css 的样式 -->
+      <a href="profile" class="btn btn-primary" style="width: auto; padding: 10px 30px; margin-right: 15px;">个人中心</a>
+
+      <a href="myproducts" class="btn btn-primary" style="width: auto; padding: 10px 30px; margin-right: 15px;">我的商品</a>
+
       <a href="publish" class="btn btn-primary" style="width: auto; padding: 10px 30px;">发布闲置物品</a>
     </div>
   </div>
@@ -58,7 +61,7 @@
     } else {
       for(Product p : productList) {
     %>
-    <a href="#" class="product-card">
+    <a href="detail?id=<%= p.getProductId() %>" class="product-card">
       <!-- 确保 img 标签有 product-img 类 -->
       <img src="<%= p.getImageUrl() %>" alt="<%= p.getProductName() %>" class="product-img" onerror="this.src='images/placeholder.png'">
 
